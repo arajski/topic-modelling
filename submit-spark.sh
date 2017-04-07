@@ -2,7 +2,7 @@
 
 echo "Compiling application..."
 sbt package
-
+sbt test
 # Directory where spark-submit is defined
 # Install spark from https://spark.apache.org/downloads.html
 SPARK_HOME=`pwd`/../spark-2.1.0-bin-hadoop2.6

@@ -26,6 +26,7 @@ object TopicModelling {
         val tokenized = tokenizer.transform(tweets).select("words")
             .map(w => w(0).asInstanceOf[Seq[String]].filter(_.trim.length > 2)).toDF("words")
         //removing stopwords
+        //StopWordsHelper.removeStopWords()
         val remover = new StopWordsRemover()
             .setInputCol("words")
             .setOutputCol("filtered")
@@ -84,10 +85,10 @@ object TopicModelling {
         val sc = new SparkContext(conf)
         val sparkSession = SparkSession.builder.getOrCreate()
         import sparkSession.implicits._
-        var df = sparkSession.read.json("hdfs://localhost:9000/hdfs/data/Oct21.txt")
-        runLDA(df,sparkSession,"oct21_results.txt")
-
-        df = sparkSession.read.json("hdfs://localhost:9000/hdfs/data/Oct22.txt")
+        //var df = sparkSession.read.json("hdfs://localhost:9000/hdfs/data/Oct21.txt")
+        //runLDA(df,sparkSession,"oct21_results.txt")
+        
+        /*df = sparkSession.read.json("hdfs://localhost:9000/hdfs/data/Oct22.txt")
         runLDA(df,sparkSession,"oct22_results.txt")
 
         df = sparkSession.read.json("hdfs://localhost:9000/hdfs/data/Oct23.txt")
@@ -136,7 +137,7 @@ object TopicModelling {
         runLDA(df,sparkSession,"Nov09_results.txt")
 
         df = sparkSession.read.json("hdfs://localhost:9000/hdfs/data/Nov10.txt")
-        runLDA(df,sparkSession,"Nov10_results.txt")
+        runLDA(df,sparkSession,"Nov10_results.txt")*/
        // val oct25 = sparkSession.read.json("hdfs://localhost:9000/hdfs/data/Oct25.txt")
 
         sc.stop()
