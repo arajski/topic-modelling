@@ -37,6 +37,15 @@ class StopWordsHelperTest extends FunSuite with BeforeAndAfter{
     assert(result.count() == 1)
   }
 
+  test("it should return dataset") {
+    val sparkSession = SparkSession.builder.getOrCreate()
+    import sparkSession.implicits._
+
+    val words = Seq("i", "am", "a", "president", "donald", "trump").toDS()
+    val result = StopWordsHelper.removeStopWords(words)
+    assert(result.getClass.getName == "org.apache.spark.sql.Dataset")
+  }
+
   after {
     if (sc != null) {
       sc.stop()
