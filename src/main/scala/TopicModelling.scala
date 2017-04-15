@@ -5,7 +5,6 @@ import org.apache.spark.SparkConf
 import scala.util.parsing.json._
 import org.apache.spark.sql.DataFrame
 
-import org.apache.spark.ml.feature.{RegexTokenizer, Tokenizer}
 import org.apache.spark.ml.feature.{CountVectorizer, CountVectorizerModel}
 import org.apache.spark.ml.feature.StopWordsRemover
 import org.apache.spark.ml.clustering.LDA
@@ -21,10 +20,8 @@ object TopicModelling {
 
         val tweets = df.select("text").map(tweet => formatTweet(tweet(0)))
 
-        //tokenizing tweet
-        val tokenizer = new Tokenizer().setInputCol("value").setOutputCol("words")
-        val tokenized = tokenizer.transform(tweets).select("words")
-            .map(w => w(0).asInstanceOf[Seq[String]].filter(_.trim.length > 2)).toDF("words")
+        val tokenized = tweets//tokenizer.transform(tweets).select("words")
+        //    .map(w => w(0).asInstanceOf[Seq[String]].filter(_.trim.length > 2)).toDF("words")
         //removing stopwords
         //StopWordsHelper.removeStopWords()
         val remover = new StopWordsRemover()
@@ -79,12 +76,12 @@ object TopicModelling {
     }
 
     def main(args: Array[String]) {
-
         // initialise spark context
         val conf = new SparkConf().setAppName("TopicModelling")
         val sc = new SparkContext(conf)
         val sparkSession = SparkSession.builder.getOrCreate()
         import sparkSession.implicits._
+
         //var df = sparkSession.read.json("hdfs://localhost:9000/hdfs/data/Oct21.txt")
         //runLDA(df,sparkSession,"oct21_results.txt")
         

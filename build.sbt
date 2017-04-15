@@ -3,13 +3,17 @@ name := "TopicModelling"
 version := "1.0"
  
 scalaVersion := "2.11.8"
- 
+sparkVersion := "2.1.0"
+
+sparkComponents ++= Seq(
+	"core", "sql", "mllib"
+)
+
+
 libraryDependencies ++= Seq(
-  "org.apache.spark" %% "spark-core" % "2.1.0",
-  "org.apache.spark" %% "spark-sql" % "2.1.0",
-  "org.apache.spark" %% "spark-mllib" % "2.1.0",
   "org.scalactic" %% "scalactic" % "3.0.1",
   "org.scalatest" %% "scalatest" % "3.0.1" % "test"
 )
 
 logBuffered in Test := false
+parallelExecution in Test := false

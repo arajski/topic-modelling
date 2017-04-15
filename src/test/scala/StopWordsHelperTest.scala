@@ -25,6 +25,7 @@ class StopWordsHelperTest extends FunSuite with BeforeAndAfter{
 
   test("it should contain list of stopwords") {
     var stopWords = StopWordsHelper.getStopWords()
+
     assert(stopWords.size > 0)
   }
 
@@ -34,6 +35,7 @@ class StopWordsHelperTest extends FunSuite with BeforeAndAfter{
     
     val words = Seq("i", "am", "a", "president", "donald", "trump").toDS()
     val result = StopWordsHelper.removeStopWords(words)
+
     assert(result.count() == 1)
   }
 
@@ -43,6 +45,7 @@ class StopWordsHelperTest extends FunSuite with BeforeAndAfter{
 
     val words = Seq("i", "am", "a", "president", "donald", "trump").toDS()
     val result = StopWordsHelper.removeStopWords(words)
+    
     assert(result.getClass.getName == "org.apache.spark.sql.Dataset")
   }
 
@@ -50,5 +53,6 @@ class StopWordsHelperTest extends FunSuite with BeforeAndAfter{
     if (sc != null) {
       sc.stop()
     }
+    System.clearProperty("spark.driver.port")
   }
 }
