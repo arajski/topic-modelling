@@ -33,20 +33,31 @@ class StopWordsHelperTest extends FunSuite with BeforeAndAfter{
     val sparkSession = SparkSession.builder.getOrCreate()
     import sparkSession.implicits._
     
-    val words = Seq("i", "am", "a", "president", "donald", "trump").toDS()
+    val words = Seq("i", "am", "a", "president", "donald", "trump")
     val result = StopWordsHelper.removeStopWords(words)
+    val expected = Seq("president")
 
-    assert(result.count() == 1)
+    assert(result == expected)
+  }
+  test("it should remove special tokens") {
+    val sparkSession = SparkSession.builder.getOrCreate()
+    import sparkSession.implicits._
+    
+    val words = Seq("a", "@test", "of", "special", "#tokens", "http://google.com", "14:00","...","!","......")
+    val result = StopWordsHelper.removeStopWords(words)
+    val expected = Seq("special","14:00")
+
+    assert(result == expected)
   }
 
-  test("it should return dataset") {
+  test("it should return a Sequence") {
     val sparkSession = SparkSession.builder.getOrCreate()
     import sparkSession.implicits._
 
-    val words = Seq("i", "am", "a", "president", "donald", "trump").toDS()
+    val words = Seq("i", "am", "a", "president", "donald", "trump")
     val result = StopWordsHelper.removeStopWords(words)
     
-    assert(result.getClass.getName == "org.apache.spark.sql.Dataset")
+    assert(result.getClass.getName == "scala.collection.immutable.$colon$colon")
   }
 
   after {

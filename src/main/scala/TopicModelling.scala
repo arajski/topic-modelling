@@ -6,7 +6,6 @@ import scala.util.parsing.json._
 import org.apache.spark.sql.DataFrame
 
 import org.apache.spark.ml.feature.{CountVectorizer, CountVectorizerModel}
-import org.apache.spark.ml.feature.StopWordsRemover
 import org.apache.spark.ml.clustering.LDA
 import org.apache.spark.sql.functions._
 
@@ -18,19 +17,14 @@ object TopicModelling {
     def runLDA(df: DataFrame, sparkSession: SparkSession, file: String) = {
         import sparkSession.implicits._
 
-        val tweets = df.select("text").map(tweet => formatTweet(tweet(0)))
+        val tweets = df.select("text")
 
-        val tokenized = tweets//tokenizer.transform(tweets).select("words")
-        //    .map(w => w(0).asInstanceOf[Seq[String]].filter(_.trim.length > 2)).toDF("words")
-        //removing stopwords
-        //StopWordsHelper.removeStopWords()
-        val remover = new StopWordsRemover()
-            .setInputCol("words")
-            .setOutputCol("filtered")
-        val filtered = remover.transform(tokenized)
+        //tokenization
+        val tokenized = NLPHelper.processDocuments(tweets,"text")
+        val filtered = tokenized.map(t => StopWordsHelper.removeStopWords(t))
         //counting tokens
         val cvModel: CountVectorizerModel = new CountVectorizer()
-            .setInputCol("filtered")
+            .setInputCol("value")
             .setOutputCol("features")
             .fit(filtered)
         val vocabularyArray = cvModel.vocabulary
@@ -39,7 +33,7 @@ object TopicModelling {
         val parsedData = vectorized.select("features")
 
         //obtaining topics
-        val lda = new LDA().setK(5)
+        val lda = new LDA().setK(10)
         val model = lda.fit(parsedData)
 
         // Describe topics.
@@ -67,13 +61,6 @@ object TopicModelling {
         fw.close()
 
     }
-    def formatTweet(tweet: Any) = {
-        var formattedTweet = tweet.asInstanceOf[String]
-        .replaceAll("http[^\\s]+", " ")
-        .replaceAll("[^\\p{L}\\p{Nd}]+", " ")
-        .replaceAll("[^\u0000-\uFFFF]", " ")
-        formattedTweet
-    }
 
     def main(args: Array[String]) {
         // initialise spark context
@@ -82,8 +69,8 @@ object TopicModelling {
         val sparkSession = SparkSession.builder.getOrCreate()
         import sparkSession.implicits._
 
-        //var df = sparkSession.read.json("hdfs://localhost:9000/hdfs/data/Oct21.txt")
-        //runLDA(df,sparkSession,"oct21_results.txt")
+        var df = sparkSession.read.json("hdfs://localhost:9000/hdfs/data/Oct21.txt")
+        runLDA(df,sparkSession,"oct21_results.txt")
         
         /*df = sparkSession.read.json("hdfs://localhost:9000/hdfs/data/Oct22.txt")
         runLDA(df,sparkSession,"oct22_results.txt")
