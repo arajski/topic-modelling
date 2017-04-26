@@ -11,11 +11,18 @@ object NLPHelper {
     import sparkSession.implicits._
 
 	def processDocuments(documents: DataFrame, column: String) : Dataset[Seq[String]] = {
+		val documentsWithoutEmojis = removeEmojis(documents, column)
+		val output = documents.select(lemma(lower(col(column))).as('words))
 
-		val output = documents
-		  .select(lemma(lower(col(column))).as('words))
-
-		return output.toDF("tokens").as[Seq[String]]
+		output.toDF("tokens").as[Seq[String]]
 	}
+
+	def removeEmojis(df: DataFrame, column: String) : Dataset[String] = {
+		df.select(col(column)).map(tweet => formatTweet(tweet(0)))
+	}
+
+	def formatTweet(tweet: Any) = {
+       tweet.asInstanceOf[String].replaceAll("[^\u0000-\uFFFF]", "")
+    }
 
 }

@@ -33,13 +33,13 @@ object TopicModelling {
         val parsedData = vectorized.select("features")
 
         //obtaining topics
-        val lda = new LDA().setK(10)
-        val model = lda.fit(parsedData)
+        //val lda = new LDA().setK(8).checkpointInterval(100).setMaxIter(300)
+        //val model = lda.fit(parsedData)
 
         // Describe topics.
-        val topics = model.describeTopics(10)
+        //val topics = model.describeTopics(10)
         //Save topics to file
-        printTopics(topics,file,vocabularyArray)
+        //printTopics(topics,file,vocabularyArray)
         
     }
     def printTopics(topics: DataFrame, filename: String, vocabularyArray: Array[String]) = {

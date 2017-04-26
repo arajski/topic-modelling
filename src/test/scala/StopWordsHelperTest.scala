@@ -59,6 +59,15 @@ class StopWordsHelperTest extends FunSuite with BeforeAndAfter{
     
     assert(result.getClass.getName == "scala.collection.immutable.$colon$colon")
   }
+  test("it should remove tokenized brackets") {
+    val sparkSession = SparkSession.builder.getOrCreate()
+    import sparkSession.implicits._
+    
+    val words = Seq("-lrb-","-rrb-","-lcb-","-rcb-","-lsb-","-rsb-")
+    val result = StopWordsHelper.removeStopWords(words)
+
+    assert(result.size == 0)
+  }
 
   after {
     if (sc != null) {

@@ -14,21 +14,22 @@ object StopWordsHelper {
     * Remove hashtags, user annotations, urls and words smaller than 3 characters, except numbers 
     */
     def isSpecialToken(token: String) : Boolean = {
-    	val isSpecial = (token contains "@") || 
-    					(token contains "#") || 
-    					(token contains "http") ||
-    					(token contains "!") ||
-    					(token contains ".") ||
-    					(token contains "?") ||    
-    					((token.length < 3) && Try(token.toDouble).isFailure)
-    	isSpecial
+    	(token contains "@") || 
+		(token contains "#") || 
+		(token contains "http") ||
+		(token contains "!") ||
+		(token contains ".") ||
+		(token contains "?") ||    
+		(token.length < 3)
     }
 
-    def getStopWords() : Set[String] =
+    def getStopWords() : Set[String] = {
     	stopWords
+    }
 
-    def removeStopWords(tokens: Seq[String]) : Seq[String] = 
+    def removeStopWords(tokens: Seq[String]) : Seq[String] = {
       	tokens.filter(s => !stopWords.contains(s) && !isSpecialToken(s))
+    }
     
 }
 
