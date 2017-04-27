@@ -58,11 +58,11 @@ class NLPHelperTest extends FunSuite with BeforeAndAfter{
 
     assert(result == expected)
   }
-  test("it should ignore emojis") {
+  test("it should remove invalid characters") {
     val sparkSession = SparkSession.builder.getOrCreate()
     import sparkSession.implicits._
 
-    val input = Seq(("This is an emoji test\uFFFF\uFFFF\uFFFF.Second\uFFFFtest")).toDF("text")
+    val input = Seq(("This is an emoji test�.Second���test")).toDF("text")
     val output = NLPHelper.processDocuments(input,"text")
     val result = output.select(col("tokens")).first().get(0)
     val expected = Seq("this", "be", "a", "emoji", "test",".","second","test")
@@ -74,7 +74,7 @@ class NLPHelperTest extends FunSuite with BeforeAndAfter{
     import sparkSession.implicits._
 
     val tweet = Seq("Test tweet😄😃").toDF("text")
-    val result = NLPHelper.removeEmojis(tweet,"text").first()
+    val result = NLPHelper.removeInvalidCharacters(tweet,"text").first()
     assert(result == "Test tweet")
   }
   test("it returns tokens in lowercase") {

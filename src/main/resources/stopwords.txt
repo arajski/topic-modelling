@@ -4,6 +4,14 @@
 -rcb-
 -lsb-
 -rsb-
+get
+ago
+put
+smh
+boo
+just
+troo-ump
+troo-urmp
 a
 about
 above

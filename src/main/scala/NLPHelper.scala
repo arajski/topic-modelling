@@ -11,13 +11,13 @@ object NLPHelper {
     import sparkSession.implicits._
 
 	def processDocuments(documents: DataFrame, column: String) : Dataset[Seq[String]] = {
-		val documentsWithoutEmojis = removeEmojis(documents, column)
-		val output = documents.select(lemma(lower(col(column))).as('words))
+		val validDocuments = removeInvalidCharacters(documents, column)
+		val output = validDocuments.select(lemma(lower('value)).as('words))
 
 		output.toDF("tokens").as[Seq[String]]
 	}
 
-	def removeEmojis(df: DataFrame, column: String) : Dataset[String] = {
+	def removeInvalidCharacters(df: DataFrame, column: String) : Dataset[String] = {
 		df.select(col(column)).map(tweet => formatTweet(tweet(0)))
 	}
 
