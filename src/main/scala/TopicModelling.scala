@@ -82,12 +82,9 @@ object TopicModelling {
             val filePath = file.getPath().toString()
             val resultName = filePath.slice(filePath.indexOf("/data")+6,filePath.length-4)
 
-            //val documents = sparkSession.read.json(filePath)
-            //runLDA(documents,sparkSession,"results/"+resultName+"_results.txt")
+            val documents = sparkSession.read.json(filePath)
+            runLDA(documents,sparkSession,"results/"+resultName+"_results.txt")
         }
-
-        var df = sparkSession.read.json("hdfs://localhost:9000/hdfs/data/Oct21.txt")
-        runLDA(df,sparkSession,"oct21_results.txt")
 
         sc.stop()
 
