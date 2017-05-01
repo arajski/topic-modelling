@@ -11,5 +11,5 @@ JARFILE=`pwd`/target/scala-2.11/topicmodelling_2.11-1.0.jar
 #rm $JARFILE
 # Run it locally
 
-#${SPARK_HOME}/bin/spark-submit --jars $JARS \
-#--class TopicModelling --master local $JARFILE
+${SPARK_HOME}/bin/spark-submit --jars $JARS \
+--class TopicModelling --master local $JARFILE

@@ -121,6 +121,17 @@ class NLPHelperTest extends FunSuite with BeforeAndAfter{
 
     assert(result == expected)
   }
+  test("it should filter nouns") {
+    val sparkSession = SparkSession.builder.getOrCreate()
+    import sparkSession.implicits._
+
+    val input = Seq((Seq("apple","house","writing","with","happy"),Seq("NNS","NN", "ADV", "VER", "ADV"))).toDF("tokens","pos").as[(Seq[String], Seq[String])]
+    val output = NLPHelper.selectNouns(input)
+    val result = output.select("value").first().get(0)
+    val expected = Seq("apple","house")
+
+    assert(result == expected)
+  }
   after {
     if (sc != null) {
       sc.stop()

@@ -21,16 +21,16 @@ object TopicModelling {
         val tweets = df.select("text")
 
         //tokenizing documents
-        val tokenized = NLPHelper.processDocuments(tweets,"text")
-
+        val tokens = NLPHelper.processDocuments(tweets,"text")
+        val nouns = NLPHelper.selectNouns(tokens)
         //removing stopwords
-        val filtered = tokenized.map(t => StopWordsHelper.removeStopWords(t))
-
+        val filtered = nouns.map(t => StopWordsHelper.removeStopWords(t))
+        
         //counting tokens
         val cvModel: CountVectorizerModel = new CountVectorizer()
             .setInputCol("value")
             .setOutputCol("features")
-            .fit(filtered)
+            .fit(nouns)
         val vocabularyArray = cvModel.vocabulary
 
         val vectorized = cvModel.transform(filtered)
@@ -38,7 +38,7 @@ object TopicModelling {
 
         //running LDA
         val lda = new LDA().setSeed(80)
-                            .setK(8)
+                            .setK(6)
                             .setMaxIter(300)
                             .setCheckpointInterval(100)
         val model = lda.fit(parsedData)

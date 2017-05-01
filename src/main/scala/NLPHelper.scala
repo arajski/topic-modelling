@@ -10,11 +10,12 @@ object NLPHelper {
 	val sparkSession = SparkSession.builder.getOrCreate()
     import sparkSession.implicits._
 
-	def processDocuments(documents: DataFrame, column: String) : Dataset[Seq[String]] = {
+	def processDocuments(documents: DataFrame, column: String) : Dataset[(Seq[String], Seq[String])] = {
 		val validDocuments = removeInvalidCharacters(documents, column)
-		val output = validDocuments.select(lemma(lower('value)).as('words))
+		val output = validDocuments.select(lemma(lower('value)).as('words),
+											pos(lower('value)).as('pos))
 
-		output.toDF("tokens").as[Seq[String]]
+		output.toDF("tokens","pos").as[(Seq[String],Seq[String])]
 	}
 
 	def removeInvalidCharacters(df: DataFrame, column: String) : Dataset[String] = {
@@ -24,5 +25,11 @@ object NLPHelper {
 	def formatTweet(tweet: Any) = {
        tweet.asInstanceOf[String].replaceAll("[^\u0000-\uFFFF]", "")
     }
-
+    def selectNouns(ds: Dataset[(Seq[String], Seq[String])]) : Dataset[Seq[String]] = {
+    	ds.map(x=> getNouns(x._1,x._2))
+    } 
+    def getNouns(tokens: Seq[String], pos: Seq[String]) : Seq[String] = {
+    	val indexes = pos.zipWithIndex.collect{ case(a,b) if (a == "NN" || a == "NNS") => b}
+    	indexes.map(tokens)
+    }
 }
