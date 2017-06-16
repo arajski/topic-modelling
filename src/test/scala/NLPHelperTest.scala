@@ -10,7 +10,7 @@ import org.apache.spark.sql.functions._
 
 class NLPHelperTest extends FunSuite with BeforeAndAfter{
 
-  private val master = "local[2]"
+  private val master = "local"
   private val appName = "NLPTest"
 
   private var sc: SparkContext = _
@@ -28,7 +28,7 @@ class NLPHelperTest extends FunSuite with BeforeAndAfter{
     import sparkSession.implicits._
 
     val input = Seq(("14:00 PM o'clock 1st January 2017")).toDF("text")
-    val output = NLPHelper.processDocuments(input,"text")
+    val output = NLPHelper.processDocuments(input,"text",sparkSession)
     val result = output.select(col("tokens")).first().get(0)
     val expected = Seq("14:00", "pm", "o'clock", "1st", "january", "2017")
 
@@ -40,7 +40,7 @@ class NLPHelperTest extends FunSuite with BeforeAndAfter{
     import sparkSession.implicits._
 
     val input = Seq(("This is a test Tweet, \"test cite\" http://test.url #hashtag#secondhashtag @user.!!!")).toDF("text")
-    val output = NLPHelper.processDocuments(input,"text")
+    val output = NLPHelper.processDocuments(input,"text",sparkSession)
     val result = output.select(col("tokens")).first().get(0)
     val expected = Seq("this", "be", "a", "test","tweet", ",","``","test","cite","''","http://test.url", "#hashtag","#secondhashtag", "@user", ".","!!!")
 
@@ -52,7 +52,7 @@ class NLPHelperTest extends FunSuite with BeforeAndAfter{
     import sparkSession.implicits._
 
     val input = Seq(("I am. You are. You shouldn't have done it so quickly.")).toDF("text")
-    val output = NLPHelper.processDocuments(input,"text")
+    val output = NLPHelper.processDocuments(input,"text",sparkSession)
     val result = output.select(col("tokens")).first().get(0)
     val expected = Seq("i", "be", ".", "you", "be", ".", "you", "should", "not", "have", "do", "it", "so", "quickly", ".")
 
@@ -63,7 +63,7 @@ class NLPHelperTest extends FunSuite with BeforeAndAfter{
     import sparkSession.implicits._
 
     val input = Seq(("This is an emoji test�.Second���test")).toDF("text")
-    val output = NLPHelper.processDocuments(input,"text")
+    val output = NLPHelper.processDocuments(input,"text",sparkSession)
     val result = output.select(col("tokens")).first().get(0)
     val expected = Seq("this", "be", "a", "emoji", "test",".","second","test")
 
@@ -74,7 +74,7 @@ class NLPHelperTest extends FunSuite with BeforeAndAfter{
     import sparkSession.implicits._
 
     val tweet = Seq("Test tweet😄😃").toDF("text")
-    val result = NLPHelper.removeInvalidCharacters(tweet,"text").first()
+    val result = NLPHelper.removeInvalidCharacters(tweet,"text",sparkSession).first()
     assert(result == "Test tweet")
   }
   test("it returns tokens in lowercase") {
@@ -82,7 +82,7 @@ class NLPHelperTest extends FunSuite with BeforeAndAfter{
     import sparkSession.implicits._
 
     val input = Seq(("lowercase UPPERCASE Standard CaMeLcAsE")).toDF("text")
-    val output = NLPHelper.processDocuments(input,"text")
+    val output = NLPHelper.processDocuments(input,"text",sparkSession)
     val result = output.select(col("tokens")).first().get(0)
     val expected = Seq("lowercase", "uppercase", "standard", "camelcase")
 
@@ -94,7 +94,7 @@ class NLPHelperTest extends FunSuite with BeforeAndAfter{
     import sparkSession.implicits._
 
     val input = Seq(("Test text")).toDF("text")
-    val result = NLPHelper.processDocuments(input,"text")
+    val result = NLPHelper.processDocuments(input,"text",sparkSession)
 
     assert(result.getClass.getName == "org.apache.spark.sql.Dataset")
   }
@@ -104,7 +104,7 @@ class NLPHelperTest extends FunSuite with BeforeAndAfter{
     import sparkSession.implicits._
 
     val input = Seq(("First document"),("Second documents"), ("Third document")).toDF("text")
-    val result = NLPHelper.processDocuments(input,"text")
+    val result = NLPHelper.processDocuments(input,"text",sparkSession)
 
     assert(result.count == 3)
   }
@@ -113,7 +113,7 @@ class NLPHelperTest extends FunSuite with BeforeAndAfter{
     import sparkSession.implicits._
 
     val input = Seq(("(test) with {brackets} and [stuff]")).toDF("text")
-    val output = NLPHelper.processDocuments(input,"text")
+    val output = NLPHelper.processDocuments(input,"text",sparkSession)
     val result = output.select(col("tokens")).first().get(0)
     val expected = Seq("-lrb-", "test", "-rrb-", "with", 
       "-lcb-", "bracket", "-rcb-", "and", 
@@ -126,7 +126,7 @@ class NLPHelperTest extends FunSuite with BeforeAndAfter{
     import sparkSession.implicits._
 
     val input = Seq((Seq("apple","house","writing","with","happy"),Seq("NNS","NN", "ADV", "VER", "ADV"))).toDF("tokens","pos").as[(Seq[String], Seq[String])]
-    val output = NLPHelper.selectNouns(input)
+    val output = NLPHelper.selectNouns(input,sparkSession)
     val result = output.select("value").first().get(0)
     val expected = Seq("apple","house")
 

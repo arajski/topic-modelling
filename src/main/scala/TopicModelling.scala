@@ -15,18 +15,16 @@ import java.io._
 
 object TopicModelling {
 
-    def runLDA(df: DataFrame, sparkSession: SparkSession, file: String) = {
+    def runLDA(df: DataFrame, sparkSession: SparkSession, file: String, url: String) = {
         import sparkSession.implicits._
 
         val tweets = df.select("text")
 
-        //tokenizing documents
-        val tokens = NLPHelper.processDocuments(tweets,"text")
-        val nouns = NLPHelper.selectNouns(tokens)
-        //removing stopwords
+        val tokens = NLPHelper.processDocuments(tweets,"text",sparkSession)
+        val nouns = NLPHelper.selectNouns(tokens,sparkSession)
+
         val filtered = nouns.map(t => StopWordsHelper.removeStopWords(t))
         
-        //counting tokens
         val cvModel: CountVectorizerModel = new CountVectorizer()
             .setInputCol("value")
             .setOutputCol("features")
@@ -39,32 +37,28 @@ object TopicModelling {
         //running LDA
         val lda = new LDA().setSeed(80)
                             .setK(6)
-                            .setMaxIter(300)
-                            .setCheckpointInterval(100)
         val model = lda.fit(parsedData)
 
         // Describe topics.
         val topics = model.describeTopics(10)
         //Save topics to file
-        printTopics(topics,file,vocabularyArray)
+        printTopics(topics,file,vocabularyArray,sparkSession,url)
         
     }
-    def printTopics(topics: DataFrame, filename: String, vocabularyArray: Array[String]) = {
-
+    def printTopics(topics: DataFrame, filename: String, vocabularyArray: Array[String],sparkSession: SparkSession, url:String) = {
+        import sparkSession.implicits._
         val file = new File(filename)
         val fw = new BufferedWriter(new FileWriter(file,true))
-
+        var topicDF = Seq[String]()
         topics.collect().foreach { 
             r => {
-                fw.write("===================\n")    
-                fw.write("Topic:" + r(0) + "\n")
-                fw.write("===================\n")  
+                topicDF = topicDF :+ "==============="
                 r(1).asInstanceOf[Seq[Int]].foreach {
-                    t => { fw.write(vocabularyArray(t) + "\n") }
+                    t => {topicDF = topicDF :+ vocabularyArray(t)}
                 }
             }
         }   
-
+        topicDF.toDF().coalesce(1).rdd.saveAsTextFile(url + "/" + filename)
         fw.close()
 
     }
@@ -75,7 +69,8 @@ object TopicModelling {
         val sc = new SparkContext(conf)
         val sparkSession = SparkSession.builder.getOrCreate()
         import sparkSession.implicits._
-        val url = "hdfs://localhost:9000/hdfs/data"
+
+        val url = args(0)
         val hdfsFiles = FileSystem.get(new URI(url), sc.hadoopConfiguration).listStatus(new Path(url))
 
         for (file <- hdfsFiles) {
@@ -83,7 +78,8 @@ object TopicModelling {
             val resultName = filePath.slice(filePath.indexOf("/data")+6,filePath.length-4)
 
             val documents = sparkSession.read.json(filePath)
-            runLDA(documents,sparkSession,"results/"+resultName+"_results.txt")
+
+            runLDA(documents,sparkSession,resultName+"_results.txt",url)
         }
 
         sc.stop()
