@@ -47,6 +47,7 @@ object TopicModelling {
     }
     def printTopics(topics: DataFrame, filename: String, vocabularyArray: Array[String],sparkSession: SparkSession, url:String) = {
         import sparkSession.implicits._
+        
         val file = new File(filename)
         val fw = new BufferedWriter(new FileWriter(file,true))
         var topicDF = Seq[String]()

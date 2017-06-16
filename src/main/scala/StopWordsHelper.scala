@@ -8,13 +8,17 @@ object StopWordsHelper {
 	private val stopWords = Source.fromInputStream( stream ).getLines.toSet
 
     def printStopWords() {
-        for (elem <- stopWords) println(elem) 
+        
+        for (elem <- stopWords) {
+            println(elem) 
+        }
     }
     /**
     * Remove hashtags, user annotations, urls and words smaller than 3 characters, except numbers 
     */
     def isSpecialToken(token: String) : Boolean = {
-    	(token contains "@") || 
+    	
+        (token contains "@") || 
 		(token contains "#") || 
 		(token contains "http") ||
 		(token contains "!") ||
@@ -24,11 +28,13 @@ object StopWordsHelper {
     }
 
     def getStopWords() : Set[String] = {
-    	stopWords
+    	
+        stopWords
     }
 
     def removeStopWords(tokens: Seq[String]) : Seq[String] = {
-      	tokens.filter(s => !stopWords.contains(s) && !isSpecialToken(s))
+      	
+        tokens.filter(s => !stopWords.contains(s) && !isSpecialToken(s))
     }
     
 }
