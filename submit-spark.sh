@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "Compiling application..."
-sbt -J-Xms2048m -J-Xmx2048m assembly
+#sbt -J-Xms2048m -J-Xmx2048m assembly
 #sbt test
 # Directory where spark-submit is defined
 # Install spark from https://spark.apache.org/downloads.html
@@ -14,4 +14,3 @@ JARFILE=`pwd`/target/scala-2.11/TopicModelling-assembly-1.0.jar
 # Run it locally
 
 ${SPARK_HOME}/bin/spark-submit --class TopicModelling --deploy-mode cluster --master yarn $JARFILE hdfs://localhost:9000/hdfs/data #--master local[*] $JARFILE
-#${SPARK_HOME}/bin/spark-submit --class TopicModelling s3://aws-logs-503617471175-us-west-2/LDA/TopicModelling-assembly-1.0.jar
