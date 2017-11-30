@@ -15,14 +15,14 @@ These instructions will get you a copy of the project up and running on your loc
 - [x] Scala 2.11.0
 - [x] Hadoop 2.7.3
 
-Dataset has been collected from Twitter platform using [TwitterCollector](https://github.com/rjsk/various-scripts/tree/master/twitterCollector) script.
+Dataset has been collected from Twitter platform using [TwitterCollector](https://github.com/arajski/various-scripts/tree/master/twitterCollector) script.
 
 ### Installing
 
 1. Run following commands for initial project setup:
 
 ```
-git clone http://github.com/rjsk/topic-modelling
+git clone http://github.com/arajski/topic-modelling
 cd topic-modelling
 ```
 2. Edit `submit-spark.sh` file to make sure it contains correct paths for Hadoop and Apache Spark (file contains sample configuration). 
@@ -43,9 +43,6 @@ Test cases are available in `src/test/scala` directory
 * [Stanford CoreNLP](https://stanfordnlp.github.io/CoreNLP/) - Library used for Natural Language Processing
 * [Apache Spark](https://spark.apache.org/) - Data processing and task distribution engine
 
-## Authors
-
-* **Artur Rajski** - *Initial work*
 
 ## License
 
